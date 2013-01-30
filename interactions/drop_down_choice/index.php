@@ -175,6 +175,7 @@
 	function drop_down_choice_setup(){
 	
 		drop_down_choice_before_question();
+		$func = "drop_down_choice_html";
 		echo $func("interactive_posts_element_1") . $func("interactive_posts_element_2") . $func("interactive_posts_element_3");
 		?><label>Add new option</label><input type="checkbox" name="interactive_post_type_add"  /><?PHP	
 		

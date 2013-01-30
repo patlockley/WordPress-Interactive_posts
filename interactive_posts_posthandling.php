@@ -12,14 +12,25 @@ function interactive_posts_wordpress_create($post_id)
 
 		if(count($_POST)!==0){
 		
-			if(count(get_post_meta($post_id, "interactive_post_type"))===0){
+			$post_type = get_post_meta($post_id, "interactive_post_type");
+		
+			if($post_type[0]===""||count($post_type)===0){
 			
 				update_post_meta($post_id, "interactive_post_type", $_POST["interactive_post_type"]);
 				
 			}else{
 			
+				echo $post_id;
+			
 				$type = get_post_meta($post_id, "interactive_post_type");
+					
+				print_r($type);
+				
 				$type = $type[0];
+				
+				print_r($type);
+				
+				echo "*********************";
 				
 				include dirname(__FILE__) . "/interactions/" . $type . "/index.php";
 				
