@@ -19,18 +19,10 @@ function interactive_posts_wordpress_create($post_id)
 				update_post_meta($post_id, "interactive_post_type", $_POST["interactive_post_type"]);
 				
 			}else{
-			
-				echo $post_id;
-			
+		
 				$type = get_post_meta($post_id, "interactive_post_type");
 					
-				print_r($type);
-				
 				$type = $type[0];
-				
-				print_r($type);
-				
-				echo "*********************";
 				
 				include dirname(__FILE__) . "/interactions/" . $type . "/index.php";
 				
