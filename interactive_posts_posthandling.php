@@ -12,16 +12,17 @@ function interactive_posts_wordpress_create($post_id)
 
 		if(count($_POST)!==0){
 		
-			$post_type = get_post_meta($post_id, "interactive_post_type");
+			update_post_meta($post_id, "logged_in", $_REQUEST["logged_in"]);
+			update_post_meta($post_id, "track",$_REQUEST["track"]);
+			update_post_meta($post_id, "first_answer",$_REQUEST["first_answer"]);
 		
-			if($post_type[0]===""||count($post_type)===0){
+			if(count(get_post_meta($post_id, "interactive_post_type"))===0){
 			
 				update_post_meta($post_id, "interactive_post_type", $_POST["interactive_post_type"]);
 				
 			}else{
-		
+			
 				$type = get_post_meta($post_id, "interactive_post_type");
-					
 				$type = $type[0];
 				
 				include dirname(__FILE__) . "/interactions/" . $type . "/index.php";

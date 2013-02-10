@@ -1,0 +1,29 @@
+.option_holder h2{
+	cursor:hand;
+	cursor:pointer;
+}
+
+#before_interaction{
+	width:100%;
+}
+
+.interactive_hidden{
+	display:none;
+}
+
+.option_holder{
+	float:left;
+	position:relative;
+	width:100%;
+	border-top:1px solid black;
+	clear:both;
+	margin:10px 0px;
+}
+
+.option_holder input{
+	width:100%;
+}
+
+textarea.hundredpercent{
+	width:100%;
+}

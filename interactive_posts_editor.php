@@ -21,7 +21,12 @@ function interactive_posts_editor_javascript($hook) {
 			return;
 		
 		$type = $type[0];
-				
+		
+		wp_enqueue_script( 'interactive_posts_editor', plugins_url('/js/interactive_posts.js', __FILE__), array('jquery'));
+		wp_register_style( 'interactive_posts_css', plugins_url('/css/interactive_posts.css', __FILE__) );
+		wp_enqueue_style( 'interactive_posts_css' );
+		
+		
 		wp_enqueue_script( 'interactive_posts_editor_' . $type, plugins_url('/interactions/' . $type . '/js/admin/index.js', __FILE__), array('jquery'));
 		wp_register_style( 'interactive_posts_css_' . $type, plugins_url('/interactions/' . $type . '/css/admin/index.css', __FILE__) );
 		wp_enqueue_style( 'interactive_posts_css_' . $type );
@@ -59,7 +64,7 @@ function interactive_posts_wordpress_editor(){
 		
 		}
 		
-		echo "</select>";
+		echo "</select><p>Once you have chosen, click 'save draft'</p>";
 	
 	}else{
 	
@@ -70,7 +75,7 @@ function interactive_posts_wordpress_editor(){
 		
 		$table_name = $wpdb->prefix . "interactive_posts_elements";
 	
-		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " order by id ASC", OBJECT);
+		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and keyname !='before_interaction' order by id ASC", OBJECT);
 		
 		echo "<div>";
 		
@@ -81,6 +86,10 @@ function interactive_posts_wordpress_editor(){
 			
 			echo "<p>This interaction is a " . str_replace("_"," ",$type) . "</p>";
 			
+			echo "<p>Only available if logged in <input type='checkbox' name='logged_in' /></p>";
+			echo "<p>Track scores of people taking the quiz <input type='checkbox' name='track' /></p>";
+			echo "<p>Only accept first answer <input type='checkbox' name='first_answer' /></p>";
+			
 			$func();
 		
 		}else{
@@ -90,6 +99,40 @@ function interactive_posts_wordpress_editor(){
 			$func = $type . "_edit";
 		
 			echo "<p>This interaction is a " . str_replace("_"," ",$type) . "</p>";	
+			
+			if(get_post_meta($post->ID, "logged_in",true)=="on"){
+			
+				$logged_in = " checked "; 
+			
+			}else{
+			
+				$logged_in = "";
+			
+			}
+			
+			if(get_post_meta($post->ID, "track",true)=="on"){
+			
+				$track = " checked "; 
+			
+			}else{
+			
+				$track = "";
+			
+			}
+			
+			if(get_post_meta($post->ID, "first_answer",true)=="on"){
+			
+				$first_answer = " checked "; 
+			
+			}else{
+			
+				$first_answer = "";
+			
+			}
+			
+			echo "<p>Only available if logged in <input type='checkbox' name='logged_in' " . $logged_in . " /></p>";
+			echo "<p>Track scores of people taking the quiz <input type='checkbox' name='track' " . $track . " /></p>";
+			echo "<p>Only accept first answer <input type='checkbox' name='first_answer' " . $first_answer . " /></p>";
 
 			$func($data);
 		

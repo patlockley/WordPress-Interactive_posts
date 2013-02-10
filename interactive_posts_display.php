@@ -29,31 +29,55 @@ function interactive_posts_display_javascript($hook) {
 
 add_filter("the_content", "interactive_posts_wordpress_display");
 
+function interactive_posts_render($post){
+	
+	$type = get_post_meta($post->ID, "interactive_post_type");
+	$type = $type[0];
+	
+	global $wpdb;
+	
+	$table_name = $wpdb->prefix . "interactive_posts_elements";
+
+	$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID, OBJECT);
+	
+	if(count($data)===0){
+		
+		echo "<p>This Interactive Post has no content</p>";
+	
+	}else{
+	
+		include "interactions/" . $type . "/index.php";
+		$func = $type . "_display";
+		$func();
+	
+	}
+
+}
+
 function interactive_posts_wordpress_display($content)
 {
 
 	global $post;
 
 	if($post->post_type=="interactive_posts"){
-	
-		$type = get_post_meta($post->ID, "interactive_post_type");
-		$type = $type[0];
-		
-		global $wpdb;
-		
-		$table_name = $wpdb->prefix . "interactive_posts_elements";
-	
-		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID, OBJECT);
-		
-		if(count($data)===0){
+
+		if(get_post_meta($post->ID, "logged_in",true)!=="on"){
 			
-			echo "<p>This Interactive Post has no content</p>";
-		
+			interactive_posts_render($post);
+			
 		}else{
 		
-			include "interactions/" . $type . "/index.php";
-			$func = $type . "_display";
-			$func();
+			$user = wp_get_current_user();
+			
+			if($user->ID!="0"){
+			
+				interactive_posts_render($post);
+			
+			}else{
+			
+				echo "<p>You must be logged in to use this page</p>";
+			
+			}
 		
 		}
 	

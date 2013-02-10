@@ -18,8 +18,6 @@
 	
 	register_activation_hook( __FILE__, 'interactive_posts_activate' );
 	
-	register_deactivation_hook( __FILE__ , 'xerteonline_deactivate');
-	
 	function interactive_posts_activate(){
 	
 		global $interactive_posts_db_version, $wpdb;
@@ -31,7 +29,22 @@
 		$sql = "CREATE TABLE " . $table_name . " (
 			  id bigint(20) NOT NULL AUTO_INCREMENT,
 			  post_id  bigint(20),
+			  keyname varchar(100),
 			  data varchar(1000),
+			  UNIQUE KEY id(id)
+			);";
+
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($sql);
+		
+		$table_name = $wpdb->prefix . "interactive_posts_results";
+			  
+		$sql = "CREATE TABLE " . $table_name . " (
+			  id bigint(20) NOT NULL AUTO_INCREMENT,
+			  post_id  bigint(20),
+			  user_id varchar(10),
+			  data varchar(1000),
+			  submitted bigint(20),
 			  UNIQUE KEY id(id)
 			);";
 

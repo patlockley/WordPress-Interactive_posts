@@ -1,5 +1,11 @@
 <?PHP
 
+	function single_question_track($answer){
+	
+		return $answer;
+	
+	}
+
 	function single_question_ajax(){
 	
 		global $wpdb;
@@ -11,26 +17,50 @@
 				"
 						select data FROM " . $table_name . "
 						WHERE post_id = %d and
-						data like '%s'
+						keyname like '%s'
 				",
 						$_REQUEST['post'], 
-						"%_element_%"
+						"%_option"
 				)
-		);
+		);	
 		
 		$data = $wpdb->last_result;
 		
-		$answer = unserialize($data[0]->data);
+		if($data[0]->data==$_REQUEST['value']){
 		
-		if($answer[1]==$_REQUEST['value']){
-		
-			$feedback = unserialize($data[1]->data);
-			echo $feedback[1];
+			$data = $wpdb->query( 
+			$wpdb->prepare( 
+				"
+						select data FROM " . $table_name . "
+						WHERE post_id = %d and
+						keyname like '%s'
+				",
+						$_REQUEST['post'], 
+						"%\_correct"
+				)
+			);
+			
+			$data = $wpdb->last_result;
+			
+			echo $data[0]->data;
 		
 		}else{
 		
-			$feedback = unserialize($data[2]->data);
-			echo $feedback[1];
+			$data = $wpdb->query( 
+			$wpdb->prepare( 
+				"
+						select data FROM " . $table_name . "
+						WHERE post_id = %d and
+						keyname like '%s'
+				",
+						$_REQUEST['post'], 
+						"%\_incorrect"
+				)
+			);
+			
+			$data = $wpdb->last_result;
+			
+			echo $data[0]->data;
 			
 		}
 		
@@ -44,13 +74,11 @@
 	
 		echo "<textarea name='before_interaction'>";
 		
-		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and data like '%before_interaction%'", OBJECT);
+		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and keyname = 'before_interaction'", OBJECT);
 		
 		if(count($data)!==0){
 		
-			$output = unserialize($data[0]->data);
-		
-			echo $output[1];
+			echo $data[0]->data;
 		
 		}
 		
@@ -79,9 +107,9 @@
 		$wpdb->query( 
 			$wpdb->prepare( 
 				"
-						INSERT INTO " . $table_name . "(post_id, data)VALUES(%d,'%s')
+						INSERT INTO " . $table_name . "(post_id, keyname,  data)VALUES(%d,'%s','%s')
 				",
-						$post_id, serialize(array("before_interaction", $_POST['before_interaction'])) 
+						$post_id, "before_interaction", $_POST['before_interaction']
 				)
 		);
 		
@@ -92,9 +120,9 @@
 				$wpdb->query( 
 					$wpdb->prepare( 
 						"
-								INSERT INTO " . $table_name . "(post_id, data)VALUES(%d,'%s')
+								INSERT INTO " . $table_name . "(post_id, keyname, data)VALUES(%d,'%s','%s')
 						",
-								$post_id, serialize(array($key, $value)) 
+								$post_id, $key, $value
 						)
 				);
 				
@@ -104,28 +132,6 @@
 		
 		}
 		
-		if($_POST['interactive_post_type_add']=="on"){
-		
-			$wpdb->query( 
-				$wpdb->prepare( 
-					"
-							INSERT INTO " . $table_name . "(post_id, data)VALUES(%d,'%s')
-					",
-							$post_id, serialize(array('interactive_posts_element_' . $counter . '_option', '')) 
-					)
-			);
-			
-			$wpdb->query( 
-				$wpdb->prepare( 
-					"
-							INSERT INTO " . $table_name . "(post_id, data)VALUES(%d,'%s')
-					",
-							$post_id, serialize(array('interactive_posts_element_' . $counter . '_feedback', '')) 
-					)
-			);
-			
-		}
-	
 	}
 
 	function single_question_name(){
@@ -140,26 +146,22 @@
 		
 		$table_name = $wpdb->prefix . "interactive_posts_elements";
 	
-		$q_data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and data like '%before_interaction%'", OBJECT);
+		$q_data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and keyname = 'before_interaction'", OBJECT);
 		
 		if(count($q_data)!==0){
 		
-			$output = unserialize($q_data[0]->data);
-		
-			echo $output[1];
+			echo $q_data[0]->data;
 		
 		}
 	
-		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and data like '%_option%'", OBJECT);
+		$data = $wpdb->get_results("select * from " . $table_name . " where post_id=" . $post->ID . " and keyname like '%_option%'", OBJECT);
 	
 		foreach($data as $entry){
-		
-			$entry = unserialize($entry->data);
 	
 			echo "<p>";
 	
 			echo "<input type='textbox' id='answer' />";
-			echo "<a onclick='interactive_posts_check(" . $post->ID . ",\"single_question\",\"" . $entry[0] . "\")' >Check answer</a>";
+			echo "<a onclick='interactive_posts_check(" . $post->ID . ",\"single_question\",\"" . $entry->keyname . "\")' >Check answer</a>";
 	
 			echo "</p>";
 		
@@ -182,22 +184,20 @@
 		single_question_before_question();
 		
 		while($set = array_shift($data)){
-			
-			$interaction = unserialize($set->data);
 				
-			if(strpos($interaction[0],"_option")!==FALSE){
+			if(strpos($set->keyname,"_option")!==FALSE){
 				
-				single_question_html_build_option($interaction[0], $interaction[1]);
+				single_question_html_build_option($set->keyname, $set->data);
 					
 			}else{
 			
-				if(strpos($interaction[0],"_correct")!==FALSE){
+				if(strpos($set->keyname,"_correct")!==FALSE){
 				
-					single_question_html_build_feedback_correct($interaction[0], $interaction[1]);
+					single_question_html_build_feedback_correct($set->keyname, $set->data);
 					
-				}else if(strpos($interaction[0],"_incorrect")!==FALSE){
+				}else if(strpos($set->keyname,"_incorrect")!==FALSE){
 				
-					single_question_html_build_feedback_incorrect($interaction[0], $interaction[1]);
+					single_question_html_build_feedback_incorrect($set->keyname, $set->data);
 							
 				}
 				
@@ -209,27 +209,27 @@
 	
 	function single_question_html($id, $value = NULL){
 	
-		?><div><h2 onclick="interactive_posts_toggle(this)"><strong>-</strong> Option</h2><div><p>Enter the answer</p><input type="text" name="<?PHP echo $id; ?>_option" /></div>
-		<div><p>Enter the feedback if correct</p><textarea id="<?PHP echo $id; ?>_correct" name="<?PHP echo $id; ?>_feedback_correct" rows="10" cols="100"></textarea></p></div>
-		<div><p>Enter the feedback if incorrect</p><textarea id="<?PHP echo $id; ?>_incorrect" name="<?PHP echo $id; ?>_feedback_incorrect" rows="10" cols="100"></textarea></p></div></div><?
+		?><div><div><p>Enter the answer</p><input style="width:100%" type="text" name="<?PHP echo $id; ?>_option" /></div>
+		<div><p>Enter the feedback if correct</p><textarea style="width:100%" id="<?PHP echo $id; ?>_correct" name="<?PHP echo $id; ?>_feedback_correct" rows="10" cols="100"></textarea></p></div>
+		<div><p>Enter the feedback if incorrect</p><textarea style="width:100%" id="<?PHP echo $id; ?>_incorrect" name="<?PHP echo $id; ?>_feedback_incorrect" rows="10" cols="100"></textarea></p></div></div><?
 	
 	}
 	
 	function single_question_html_build_option($id, $value = NULL){
 	
-		?><div><p>Enter the answer</p><input type="text" name="<?PHP echo $id; ?>" value="<?PHP echo $value; ?>" /></div><?PHP
+		?><div><p>Enter the answer</p><input type="text" style="width:100%" name="<?PHP echo $id; ?>" value="<?PHP echo $value; ?>" /></div><?PHP
 		
 	}
 	
 	function single_question_html_build_feedback_correct($id, $value = NULL){
 	
-		?><div><p>Enter the feedback if correct</p><textarea id="<?PHP echo $id; ?>_correct" name="<?PHP echo $id; ?>_correct" rows="10" cols="100"><?PHP echo $value; ?></textarea></div><?PHP
+		?><div><p>Enter the feedback if correct</p><textarea style="width:100%" id="<?PHP echo $id; ?>_correct" name="<?PHP echo $id; ?>_correct" rows="10" cols="100"><?PHP echo $value; ?></textarea></div><?PHP
 		
 	}
 
 	function single_question_html_build_feedback_incorrect($id, $value = NULL){
 	
-		?><p>Enter the feedback if incorrect</p><textarea id="<?PHP echo $id; ?>_incorrect" name="<?PHP echo $id; ?>_incorrect" rows="10" cols="100"><?PHP echo $value; ?></textarea></div><?PHP
+		?><p>Enter the feedback if incorrect</p><textarea style="width:100%" id="<?PHP echo $id; ?>_incorrect" name="<?PHP echo $id; ?>_incorrect" rows="10" cols="100"><?PHP echo $value; ?></textarea></div><?PHP
 	
 	}
 
