@@ -225,7 +225,7 @@
 	
 	function drop_down_choice_remove_option($id){
 	
-		?><p><a onclick="javascript:interactive_post_remove_this('" . $id . "')">Remove this option</a></p><?PHP
+		?><p><a onclick="javascript:jQuery(this.parentNode.previousSibling).remove();jQuery(this).remove()">Remove this option</a></p><?PHP
 	
 	}
 	

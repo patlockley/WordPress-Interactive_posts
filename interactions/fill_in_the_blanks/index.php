@@ -1,5 +1,4 @@
 <?PHP
-
 	function fill_in_the_blanks_track($answer){
 	
 		sort($answer);

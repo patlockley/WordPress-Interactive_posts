@@ -48,6 +48,10 @@ function interactive_posts_wordpress_editor(){
 	
 	if($_REQUEST['post_type']=="interactive_posts"){
 	
+		?><form action="" method="post"><?PHP
+	
+		wp_nonce_field('interactive_posts_edit','interactive_posts_edit');
+	
 		$interactions = opendir(dirname(__FILE__) . "/interactions");
 		
 		echo "<p>When creating a new Interactive Post, please choose a type of interaction</p><select name='interactive_post_type'>";
@@ -64,7 +68,7 @@ function interactive_posts_wordpress_editor(){
 		
 		}
 		
-		echo "</select><p>Once you have chosen, click 'save draft'</p>";
+		echo "</select><p>Once you have chosen, click 'save draft'</p></form>";
 	
 	}else{
 	
@@ -72,6 +76,8 @@ function interactive_posts_wordpress_editor(){
 		$type = $type[0];
 		
 		global $wpdb;
+		
+		wp_nonce_field('interactive_posts_edit','interactive_posts_edit');
 		
 		$table_name = $wpdb->prefix . "interactive_posts_elements";
 	

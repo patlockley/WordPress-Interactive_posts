@@ -3,9 +3,9 @@
 	/*
 	Plugin Name: Interactive Posts 
 	Description: Interactive Posts plugin to allow for interaction in a post
-	Version: 0.01
+	Version: 0.1
 	Author: pgogy
-	Plugin URI: http://www.pgogy.com/code/xerte-online
+	Plugin URI: http://www.pgogy.com/code/groups/wordpress/interactive-posts/
 	Author URI: http://www.pgogy.com
 	License: GPL
 	*/

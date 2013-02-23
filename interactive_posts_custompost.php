@@ -38,7 +38,12 @@
 		'description' => 'A Collection of terms which which to search for resources with',
 		'supports' => array('title')
 	  ); 
+	  
 	  register_post_type('interactive_posts',$args);
+	  
+	  global $wp_rewrite;
+
+	  $wp_rewrite->flush_rules();
 
 	}
 

@@ -223,7 +223,7 @@
 	
 	function multiple_choice_html($id, $value = NULL){
 	
-		?><div><h2 onclick="interactive_posts_toggle(this)"><strong>-</strong> Option</h2><div><p>Enter an option</p><input type="text" style="width:100%" name="<?PHP echo $id; ?>_option" /></div><div><p>Enter the feedback</p><textarea style="width:100%" id="<?PHP echo $id; ?>" name="<?PHP echo $id; ?>_feedback" rows="10" cols="100"></textarea></p></div></div><?
+		?><div><h2 onclick="interactive_posts_toggle(this)"><strong>-</strong> Option</h2><div><p>Enter an option</p><input type="text" style="width:100%" name="<?PHP echo $id; ?>_option" /></div><div><p>Enter the feedback</p><textarea style="width:100%" id="<?PHP echo $id; ?>" name="<?PHP echo $id; ?>_feedback" rows="10" cols="100"></textarea></p></div></div><?PHP
 	
 	}
 	
@@ -257,7 +257,8 @@
 			
 		}
 		
-		?> ><p>Enter an option</p><input style="width:100%" type="text" name="<?PHP echo $id; ?>" value="<?PHP echo $value; ?>" /></div><?PHP
+		?> ><p>Enter an option</p><input style="width:100%" type="text" name="<?PHP echo $id; ?>" value="<?PHP echo $value; ?>" /></div>
+		<p><a onclick="javascript:jQuery(this.parentNode.parentNode).remove();">Remove this option</a></p><?PHP
 		
 	}
 	
