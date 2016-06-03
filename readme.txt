@@ -2,8 +2,8 @@
 Contributors: pgogy
 Tags: elearning, learning, education, content creation
 Requires at least: 3.1
-Tested up to: 3.5
-Stable tag: 0.1
+Tested up to: 4.5
+Stable tag: 0.2
 
 Interactive posts allows users to create basic quizzes, questions and interactions.
 

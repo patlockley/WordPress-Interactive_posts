@@ -7,30 +7,34 @@ function interactive_posts_editor_javascript($hook) {
 
 	global $post;
 	
-	if($post->post_type=="interactive_posts"){
-
-		if( 'post.php' != $hook )
-			return;
-
-		wp_enqueue_script( 'interactive_posts_tinyMCE', plugins_url('/js/tinymce/jscripts/tiny_mce/tiny_mce.js', __FILE__), array('jquery'));
-		wp_enqueue_script( 'interactive_posts_tinyMCE_start', plugins_url('/js/tinymce_start.js', __FILE__), array('jquery'));
+	if(isset($post->post_type)){
 	
-		$type = get_post_meta($post->ID, "interactive_post_type");
+		if($post->post_type=="interactive_posts"){
+
+			if( 'post.php' != $hook )
+				return;
+
+			wp_enqueue_script( 'interactive_posts_tinyMCE', plugins_url('/js/tinymce/jscripts/tiny_mce/tiny_mce.js', __FILE__), array('jquery'));
+			wp_enqueue_script( 'interactive_posts_tinyMCE_start', plugins_url('/js/tinymce_start.js', __FILE__), array('jquery'));
 		
-		if(count($type)==0)
-			return;
+			$type = get_post_meta($post->ID, "interactive_post_type");
+			
+			if(count($type)==0)
+				return;
+			
+			$type = $type[0];
+			
+			wp_enqueue_script( 'interactive_posts_editor', plugins_url('/js/interactive_posts.js', __FILE__), array('jquery'));
+			wp_register_style( 'interactive_posts_css', plugins_url('/css/interactive_posts.css', __FILE__) );
+			wp_enqueue_style( 'interactive_posts_css' );
+			
+			
+			wp_enqueue_script( 'interactive_posts_editor_' . $type, plugins_url('/interactions/' . $type . '/js/admin/index.js', __FILE__), array('jquery'));
+			wp_register_style( 'interactive_posts_css_' . $type, plugins_url('/interactions/' . $type . '/css/admin/index.css', __FILE__) );
+			wp_enqueue_style( 'interactive_posts_css_' . $type );
 		
-		$type = $type[0];
+		}
 		
-		wp_enqueue_script( 'interactive_posts_editor', plugins_url('/js/interactive_posts.js', __FILE__), array('jquery'));
-		wp_register_style( 'interactive_posts_css', plugins_url('/css/interactive_posts.css', __FILE__) );
-		wp_enqueue_style( 'interactive_posts_css' );
-		
-		
-		wp_enqueue_script( 'interactive_posts_editor_' . $type, plugins_url('/interactions/' . $type . '/js/admin/index.js', __FILE__), array('jquery'));
-		wp_register_style( 'interactive_posts_css_' . $type, plugins_url('/interactions/' . $type . '/css/admin/index.css', __FILE__) );
-		wp_enqueue_style( 'interactive_posts_css_' . $type );
-	
 	}
 	
 }
@@ -46,7 +50,13 @@ function interactive_posts_wordpress_editor(){
 
 	global $post;
 	
-	if($_REQUEST['post_type']=="interactive_posts"){
+	if(isset($_REQUEST['post_type'])){
+		$post_type = $_REQUEST['post_type'];
+	}else{
+		$post_type = $post->post_type;
+	}
+	
+	if($post_type=="interactive_posts" && isset($_REQUEST['post_type'])){
 	
 		?><form action="" method="post"><?PHP
 	
